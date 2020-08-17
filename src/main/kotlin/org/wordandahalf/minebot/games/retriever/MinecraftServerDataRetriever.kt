@@ -34,9 +34,12 @@ class MinecraftServerDataRetriever(address: InetSocketAddress) : GameServerDataR
     
     override fun retrieve(): JSONObject
     {
+        // Due to the rarity that the bot will be used to ping a legacy server,
+        // this may be put after the following code eventually.
         val legacyRetriever = LegacyMinecraftServerDataRetriever(address)
         val legacyData = legacyRetriever.retrieve()
 
+        // 'Modern' servers' responses always has 'protcolVersion'
         if(!legacyData.has("protocolVersion"))
             return legacyData
 
@@ -53,30 +56,43 @@ class MinecraftServerDataRetriever(address: InetSocketAddress) : GameServerDataR
 
         val hostname = this.address.hostString
 
-        writeVarInt(handshake, 0)
-        writeVarInt(handshake, -1)
-        writeVarInt(handshake, hostname.length)
-        handshake.writeBytes(hostname)
-        handshake.writeShort(this.address.port)
-        writeVarInt(handshake, 1)
+        // Write the ping packet.
+        // Minecraft's uncompressed packets are very, very simple, bar encoding.
+        // First, the total length of the packet is encoded as a Var(iable-length)Int,
+        // then the packet ID is written as a VarInt. The data is written after.
 
-        writeVarInt(o, b.size())
-        o.write(b.toByteArray())
+        // Here, the data is first written to a ByteArrayOutputStream before being written to the Socket
+        // so that the data's length can be calculated, since VarInts take a variable length to encode.
 
-        // Write packet
+        writeVarInt(handshake, 0)           // Packet ID
+        writeVarInt(handshake, -1)          // Protocl Version (set to -1, as per wiki.vg)
+                                                    // Strings are encoded as UTF-8, with their lengths written first as VarInts
+        writeVarInt(handshake, hostname.length)     // The length of the server's hostname
+        handshake.writeBytes(hostname)              // The server's hostname
+        handshake.writeShort(this.address.port)     // The port of the server, as a short
+        writeVarInt(handshake, 1)           // Next state, set to one to indicate status.
+
+        writeVarInt(o, b.size())                    // First, write the length of the packet
+        o.write(b.toByteArray())                    // Then write the data (with the ID prepended)
+
+        // Next, a 'request' packet is written that has no data.
+
         o.write(1) // length
         o.write(0) // ID
 
+        // First, read the total length of the packet as a VarInt
         val packetLength = readVarInt(i)
         if(packetLength == -1)
             return data.put("error", "Server closed the connection before data was transferred.")
         if(packetLength == 0)
             return data.put("error", "Server gave an invalid length of data to send.")
 
+        // Then read its ID.
         val id = readVarInt(i)
         if(id != 0)
             return data.put("error", "Server provided an invalid response.")
 
+        // The data in the response is simply JSON
         val jsonLength = readVarInt(i)
         if(jsonLength == -1)
             return data.put("error", "Server closed the connection before data was transferred.")
