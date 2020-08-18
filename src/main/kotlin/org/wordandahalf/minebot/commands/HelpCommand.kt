@@ -32,7 +32,7 @@ class HelpCommand : MinebotCommand("help")
             if (it.getUsage() == null)
                 builder.append(msg)
             else
-                builder.append("$msg> m!${it.name} ${it.getUsage()}")
+                builder.append("$msg> m!${it.name} ${it.getUsage()}\n")
         }
 
         builder.append("```")
