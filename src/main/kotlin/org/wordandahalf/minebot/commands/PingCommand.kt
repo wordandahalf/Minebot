@@ -7,7 +7,7 @@ import org.javacord.api.entity.message.embed.EmbedBuilder
 import org.javacord.api.entity.server.Server
 import org.javacord.api.event.message.MessageCreateEvent
 import org.json.JSONObject
-import org.wordandahalf.minebot.games.retriever.MinecraftServerDataRetriever
+import org.wordandahalf.minebot.games.retrievers.MinecraftServerDataRetriever
 import java.awt.Color
 import java.net.InetSocketAddress
 import java.util.*
@@ -26,14 +26,13 @@ class PingCommand : MinebotCommand("ping")
 
     override fun getUsage(): String?
     {
-        return "[address] [port]"
+        return "[address] <port>"
     }
 
     override fun getParameterCount() : Array<Int>
     {
-        return arrayOf(2)
+        return arrayOf(1, 2)
     }
-
 
     // TODO: Make this generic for future multigame compat
     override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)

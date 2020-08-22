@@ -2,6 +2,9 @@ package org.wordandahalf.minebot.commands
 
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.listener.message.MessageCreateListener
+import org.wordandahalf.minebot.commands.link.GetLinkedCommand
+import org.wordandahalf.minebot.commands.link.LinkCommand
+import org.wordandahalf.minebot.commands.link.UnlinkCommand
 
 class MinebotCommandListener : MessageCreateListener
 {
@@ -32,6 +35,9 @@ class MinebotCommandListener : MessageCreateListener
             register(HelpCommand())
             register(ConfigCommand())
             register(PingCommand())
+            register(LinkCommand())
+            register(UnlinkCommand())
+            register(GetLinkedCommand())
         }
     }
 
@@ -48,6 +54,9 @@ class MinebotCommandListener : MessageCreateListener
 
         // Get key(s) that contain the command used
         val possibleKeys = commandRegistry.filterKeys { it.contains(commandName) }.keys
+
+        if(possibleKeys.isEmpty())
+            return
 
         // There should only ever be one, if there isn't let someone know!
         if(possibleKeys.size > 1)
