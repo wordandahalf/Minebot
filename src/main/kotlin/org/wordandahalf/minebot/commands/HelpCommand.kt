@@ -1,5 +1,6 @@
 package org.wordandahalf.minebot.commands
 
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.server.Server
 import org.javacord.api.event.message.MessageCreateEvent
@@ -21,7 +22,7 @@ class HelpCommand : MinebotCommand("help")
         return null
     }
 
-    override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)
+    override fun onExecuted(e: MessageCreateEvent, s: Server, c: ServerTextChannel, args: List<String>)
     {
         val builder = StringBuilder()
         builder.append("```md\n")

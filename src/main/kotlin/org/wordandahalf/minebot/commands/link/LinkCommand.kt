@@ -1,8 +1,10 @@
 package org.wordandahalf.minebot.commands.link
 
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.server.Server
 import org.javacord.api.event.message.MessageCreateEvent
+import org.wordandahalf.minebot.MinebotLogger
 import org.wordandahalf.minebot.commands.MinebotCommand
 import org.wordandahalf.minebot.link.MinebotLinkManager
 import java.net.InetAddress
@@ -29,7 +31,7 @@ class LinkCommand : MinebotCommand("link")
         return arrayOf(2)
     }
 
-    override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)
+    override fun onExecuted(e: MessageCreateEvent, s: Server, c: ServerTextChannel, args: List<String>)
     {
         if(e.message.mentionedChannels.size != 1)
         {
@@ -44,15 +46,19 @@ class LinkCommand : MinebotCommand("link")
         {
             address = InetAddress.getByName(args[2])
         }
-        catch (e: Exception)
+        catch (err: Exception)
         {
-            c.sendMessage("Could not link ${channelToLink.mentionTag} to `${args[2]}`: ${e.message}")
+            MinebotLogger.error(c, "Could not link ${channelToLink.mentionTag} to `${args[2]}`: ${err.message}")
             return
         }
 
         if(MinebotLinkManager.link(address, s, channelToLink))
-            c.sendMessage("Linked ${channelToLink.mentionTag} to `$address`")
+        {
+            MinebotLogger.success(c, "Linked ${channelToLink.mentionTag} to `$address`")
+        }
         else
-            c.sendMessage("Could not link ${channelToLink.mentionTag} to `${address}`: ${e.message}")
+        {
+            MinebotLogger.error(c, "Could not link ${channelToLink.mentionTag} to `${address}`.")
+        }
     }
 }

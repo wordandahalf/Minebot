@@ -1,8 +1,10 @@
 package org.wordandahalf.minebot.commands.link
 
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.server.Server
 import org.javacord.api.event.message.MessageCreateEvent
+import org.wordandahalf.minebot.MinebotLogger
 import org.wordandahalf.minebot.commands.MinebotCommand
 import org.wordandahalf.minebot.link.MinebotLinkManager
 
@@ -28,7 +30,7 @@ class UnlinkCommand : MinebotCommand("unlink")
         return arrayOf(1)
     }
 
-    override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)
+    override fun onExecuted(e: MessageCreateEvent, s: Server, c: ServerTextChannel, args: List<String>)
     {
         if(e.message.mentionedChannels.size != 1)
         {
@@ -39,8 +41,8 @@ class UnlinkCommand : MinebotCommand("unlink")
         val channelToUnlink = e.message.mentionedChannels[0]
 
         if(MinebotLinkManager.unlink(s, channelToUnlink))
-            c.sendMessage("Unlinked ${channelToUnlink.mentionTag}.")
+            MinebotLogger.success(c, "Unlinked ${channelToUnlink.mentionTag}.")
         else
-            c.sendMessage("Could not unlink ${channelToUnlink.mentionTag}.")
+            MinebotLogger.error(c, "Could not unlink ${channelToUnlink.mentionTag}.")
     }
 }

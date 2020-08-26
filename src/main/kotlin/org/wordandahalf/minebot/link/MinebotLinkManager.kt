@@ -5,6 +5,7 @@ import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.server.Server
 import org.wordandahalf.minebot.Minebot
 import org.wordandahalf.minebot.MinebotConfig
+import org.wordandahalf.minebot.MinebotLogger
 import java.net.InetAddress
 
 object MinebotLinkManager
@@ -33,7 +34,7 @@ object MinebotLinkManager
 
                 val address = InetAddress.getByName(it.value as String)
 
-                println("Linking ${it.key} to ${address.toString()}")
+                MinebotLogger.debug(channel, "Linking ${it.key} to $address")
 
                 linkedChannels.putIfAbsent(address, ArrayList())
                 linkedChannels[address]?.add(channel)

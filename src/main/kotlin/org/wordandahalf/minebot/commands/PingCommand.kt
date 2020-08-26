@@ -2,6 +2,7 @@ package org.wordandahalf.minebot.commands
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.message.embed.EmbedBuilder
 import org.javacord.api.entity.server.Server
@@ -35,7 +36,7 @@ class PingCommand : MinebotCommand("ping")
     }
 
     // TODO: Make this generic for future multigame compat
-    override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)
+    override fun onExecuted(e: MessageCreateEvent, s: Server, c: ServerTextChannel, args: List<String>)
     {
         GlobalScope.launch{
             val retriever = MinecraftServerDataRetriever(InetSocketAddress(args[1], args[2].toInt()))//MinecraftServerDataRetriever(InetSocketAddress(args[1], args[2].toInt()))

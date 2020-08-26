@@ -1,10 +1,12 @@
 package org.wordandahalf.minebot.link
 
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.message.Message
 import org.javacord.api.entity.message.embed.EmbedBuilder
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.listener.message.MessageCreateListener
 import org.json.JSONObject
+import org.wordandahalf.minebot.MinebotLogger
 import java.awt.Color
 import java.net.*
 import java.nio.charset.StandardCharsets
@@ -49,6 +51,10 @@ object MinebotLinkNetworkManager
                 val packet = DatagramPacket(buffer, buffer.size)
                 server.receive(packet)
 
+                MinebotLinkManager.getLinkedChannels(packet.address)?.forEach {
+                    MinebotLogger.debug(it, "Received packet from ${packet.address}")
+                }
+
                 messageQueueIn.add(packet)
             }
         }
@@ -79,6 +85,8 @@ object MinebotLinkNetworkManager
                             6969
                         )
                     )
+
+                    MinebotLogger.debug(message.channel as ServerTextChannel, "Sent packet {'$json'} to $address")
                 }
             }
         }

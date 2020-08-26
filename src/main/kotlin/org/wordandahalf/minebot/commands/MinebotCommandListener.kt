@@ -2,6 +2,7 @@ package org.wordandahalf.minebot.commands
 
 import org.javacord.api.event.message.MessageCreateEvent
 import org.javacord.api.listener.message.MessageCreateListener
+import org.wordandahalf.minebot.MinebotLogger
 import org.wordandahalf.minebot.commands.link.GetLinkedCommand
 import org.wordandahalf.minebot.commands.link.LinkCommand
 import org.wordandahalf.minebot.commands.link.UnlinkCommand
@@ -38,6 +39,7 @@ class MinebotCommandListener : MessageCreateListener
             register(LinkCommand())
             register(UnlinkCommand())
             register(GetLinkedCommand())
+            register(DebugCommand())
         }
     }
 
@@ -45,6 +47,7 @@ class MinebotCommandListener : MessageCreateListener
     {
         val msg = e.message
         val s = if (e.server.isPresent) e.server.get() else return
+        val c = if (e.channel.asServerTextChannel().isPresent) e.channel.asServerTextChannel().get() else return
 
         if(!msg.content.startsWith(MinebotCommand.PREFIX))
             return
@@ -61,15 +64,15 @@ class MinebotCommandListener : MessageCreateListener
         // There should only ever be one, if there isn't let someone know!
         if(possibleKeys.size > 1)
         {
-            System.err.println("Found collision for command '${commandName}'!")
+            MinebotLogger.error(c, "Found collision for command '${commandName}'!")
             return
         }
 
         val command = commandRegistry[possibleKeys.elementAt(0)] ?: return
 
         if(command.getParameterCount().contains(commandWithArguments.size - 1))
-            command.onExecuted(e, s, e.channel, commandWithArguments)
+            command.onExecuted(e, s, c, commandWithArguments)
         else
-            command.printUsage(e.channel)
+            command.printUsage(c)
     }
 }

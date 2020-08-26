@@ -1,9 +1,11 @@
 package org.wordandahalf.minebot.commands.link
 
+import org.javacord.api.entity.channel.ServerTextChannel
 import org.javacord.api.entity.channel.TextChannel
 import org.javacord.api.entity.message.embed.EmbedBuilder
 import org.javacord.api.entity.server.Server
 import org.javacord.api.event.message.MessageCreateEvent
+import org.wordandahalf.minebot.MinebotLogger
 import org.wordandahalf.minebot.commands.MinebotCommand
 import org.wordandahalf.minebot.link.MinebotLinkManager
 import java.awt.Color
@@ -23,13 +25,13 @@ class GetLinkedCommand : MinebotCommand("getlinked")
 
     override fun getUsage(): String? { return null }
 
-    override fun onExecuted(e: MessageCreateEvent, s: Server, c: TextChannel, args: List<String>)
+    override fun onExecuted(e: MessageCreateEvent, s: Server, c: ServerTextChannel, args: List<String>)
     {
         val linkedChannels = MinebotLinkManager.getAllLinkedChannels(s)
 
         if(linkedChannels.size == 0)
         {
-            c.sendMessage("No linked channels.")
+            MinebotLogger.log(c, "No linked channels.")
             return
         }
 
